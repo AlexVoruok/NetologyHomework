@@ -1,34 +1,44 @@
-# Задача №1
-# Нужно реализовать Польскую нотацию для двух положительных чисел. Реализовать нужно будет следующие операции:
-#
-# Сложение
-# Вычитание
-# Умножение
-# Деление
-# Например, пользователь вводит: + 2 2 Ответ должен быть: 4
-#
-# Задача №2
-# С помощью выражения assert проверять, что первая операция в списке доступных операций (+, -, *, /).
-# С помощью конструкций try/except ловить ошибки и выводить предупреждения
-#
-# Типы ошибок:
-#
-# Деление на 0
-# Деление строк
-# Передано необходимое количество аргументов
-# и тд.
+class UnpositiveIntError(Exception):
+    def __init__(self):
+        print('Вы ввели отрицательное число')
 
-operator, operand1, operand2 = input('Введите выражение в Польской нотации: ').split(' ')
+try:
+    operator, operand1, operand2 = input('Введите арифметическое выражение с положительными'
+                                         'числами в Польской нотации: ').split(' ')
 
-assert operator in ('+', '-', '*', '/'), 'Недопустимая операция'
+    assert operator in ('+', '-', '*', '/')
 
-if operator == '+':
-    print('=', int(operand1)+int(operand2))
-elif operator == '-':
-    print('=', int(operand1)-int(operand2))
-elif operator == '*':
-    print('=', int(operand1)*int(operand2))
-else:
-    print('=', int(operand1)/int(operand2))
+    if int(operand1) < 0 or int(operand2) < 0:
+        raise UnpositiveIntError
 
-print('Жизнь продолжается')
+    if operator == '+':
+         print('=', int(operand1) + int(operand2))
+    elif operator == '-':
+         print('=', int(operand1) - int(operand2))
+    elif operator == '*':
+         print('=', int(operand1) * int(operand2))
+    elif operator == '/':
+         print('=', int(operand1) / int(operand2))
+
+
+
+except ValueError:
+    print('Выражение вводится в формате: <знак операции>_<число1>_<число2>\n'
+          'Попробуйте ещё раз')
+
+except AssertionError:
+    print('Недопустимая арифметическая операция')
+
+except ZeroDivisionError:
+    print('На ноль делить не допускается')
+
+except UnpositiveIntError:
+    print('\nВ домашке сказано - только положительные числа. \nДавайте снова.')
+
+except Exception as ex:
+    print(f'\nЧто-то пошло не так. \n{ex} \nПопробуйте ещё раз')
+
+
+finally:
+    print('\nВсем спасибо')
+
