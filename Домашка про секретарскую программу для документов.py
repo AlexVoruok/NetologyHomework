@@ -2,7 +2,10 @@
 documents = [
     {"type": "passport", "number": "2207 876234", "name": "Василий Гупкин"},
     {"type": "invoice", "number": "11-2", "name": "Геннадий Покемонов"},
-    {"type": "insurance", "number": "10006", "name": "Аристарх Павлов"}
+    {"type": "insurance", "number": "10006", "name": "Аристарх Павлов"},
+    {"type": "spravka", "number": "332", "name": ""},
+    {"type": "dogovor", "number": "1456 4568"}
+
 ]
 
 # Перечень полок, на которых находятся документы хранится в следующем виде
@@ -43,8 +46,11 @@ def people_by_number():
     # Проверяем наличие документа и выводим имя человека
     for doc in documents:
         if doc['number'] == doc_number:
-            print(doc['name'], '\n')
             exist = True
+            try:
+                print(doc['name'], '\n')
+            except KeyError:
+                print(f'Для документа {doc_number} не указан владелец\n')
     if not exist:
         print(warning_doc_num)
 
@@ -162,14 +168,28 @@ def make_new_shelf():
         print('Полка с таким номером уже существует \n')
 
 def all_doc_owners():
-    """ Эта функция выводит имена всех владельцев документов
+    """ Эта функция выводит имена всех владельцев документов из списка документов.
+        Если у документа пустое с именем или это поле вообще отсутствует - ловим это исключение
+        и выводим сообщение для пользователя
 
     """
-    # for shelf in directories:
-    #     for doc in directories[shelf]:
-    #         people_by_number() - тут надо использовать старую функцию, в ней обработать исключение если человека
-    #         для номера нет. Но сначала надо придумать как передавать переменную функции
-    pass
+    empty_name_list = []  # Список документов без указания имени
+
+    print('В базе данных о документах есть информация о следующих владельцах:\n')
+    for doc in documents:
+        try:
+            if doc['name'] == '':
+                raise KeyError
+            else:
+                print(doc['name'])
+
+        except KeyError:
+            empty_name_list.append(doc['number'])
+
+    print(' ')
+    for empty_name_doc in empty_name_list:
+        print(f'Для документа {empty_name_doc} не указан владелец')
+    print(' ')
 
 
 def main():
