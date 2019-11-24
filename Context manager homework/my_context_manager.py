@@ -46,6 +46,8 @@ def reader_writer(stream):
 
 with my_manager('eqip_list.txt') as eqip_list:
     time_start = datetime.now()
+    print('Время начала выполнения программы - ', time_start)
     reader_writer(eqip_list)
     time_end = datetime.now()
+    print('Время окончания выполнения программы - ', time_end)
     print('Время выполнения программы ч:мм:сс: ', time_end-time_start)
