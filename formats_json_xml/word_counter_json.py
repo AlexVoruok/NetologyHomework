@@ -31,7 +31,7 @@ else:
         sorted_six_char_words = sorted(six_char_words.items(), key=lambda items: items[1], reverse=True)
         return sorted_six_char_words
 
-    letters_number = 6
+    letters_number = 6   # Можем задать количество букв. Будут искаться слова длиннее
 
     sorted_words = n_char_words_sorted_list_maker(data, letters_number)
 
