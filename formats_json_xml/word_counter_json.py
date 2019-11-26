@@ -9,34 +9,51 @@ except UnicodeDecodeError:
 
 else:
 
-    def n_char_words_sorted_list_maker(dict, char_n):
+    def list_of_news_maker_of_json(dict):
         ''' Функция принимает на вход словарь с заранее известной структурой
-            и число.
+            Возвращает список всех слов новостей, переведённых в нижний регистр
+
+        '''
+        list_of_news = []
+
+        for news in dict['rss']['channel']['items']:
+            for word in news['description'].split(' '):
+                list_of_news.append(word.lower())
+
+        return list_of_news
+
+    def n_words_counter(list, char_n):
+        ''' Функция принимает на вход список слов и число
             Возвращает отсортированный список кортежей, которые содержат в себе слово
             и количество его употреблений в текстах новостей.
             Список отсортирован по убыванию количества употреблений
 
         '''
+        n_char_words = {}
+        for word in list:
+            if len(word) > char_n:
+                if word not in n_char_words.keys():
+                    n_char_words[word] = 1
+                else:
+                    n_char_words[word] += 1
 
-        six_char_words = {}
+        sorted_n_char_words = sorted(n_char_words.items(), key=lambda items: items[1], reverse=True)
+        return sorted_n_char_words
 
-        for news in dict['rss']['channel']['items']:
-            for word in news['description'].split(' '):
-                if len(word) > char_n:
-                    if word not in six_char_words.keys():
-                        six_char_words[word] = 1
-                    else:
-                        six_char_words[word] += 1
+    def toplist(n_top, char_n, news_list):
+        ''' :param n_top: количество позиций в топе
+            :param char_n: количество букв, длиннее которого мы ищем слова
+            :news_list: список слов из новостей
+            :return: печатает топ упоминаний слов длиннее указанного количества
 
-        sorted_six_char_words = sorted(six_char_words.items(), key=lambda items: items[1], reverse=True)
-        return sorted_six_char_words
+        '''
 
-    letters_number = 6   # Можем задать количество букв. Будут искаться слова длиннее
+        sorted_words = n_words_counter(news_list, char_n)
+        print(f'Топ {n_top} самых часто встречающихся слов, длиной более {char_n} букв: \n')
 
-    sorted_words = n_char_words_sorted_list_maker(data, letters_number)
+        for topword in sorted_words[0:n_top]:
+            print(f"   Слово '{topword[0]}' встречается {topword[1]} раз")
 
-    print(f'Топ 10 самых часто встречающихся слов, длиной более {letters_number} букв: \n')
 
-    for topword in sorted_words[0:11]:
-        print(f"   Слово '{topword[0]}' встречается {topword[1]} раз")
+    toplist(10, 6, list_of_news_maker_of_json(data))
 
