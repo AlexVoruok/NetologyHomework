@@ -1,5 +1,6 @@
 import requests
 from pprint import pprint
+import time
 
 # имя пользователя (eshmargunov) и id (171691064) - являются валидными входными данными.
 access_token = '73eaea320bdc0d3299faa475c196cfea1c4df9da4c6d291633f9fe8f83c08c4de2a3abf89fbc3ed8a44e1'
@@ -27,17 +28,35 @@ class User:
 
     def get_user_groups(self):
         """ возвращает множество id групп пользователя
+            или ошибку если это действие недопустимо для пользователя
+
 
         """
         groups_params = {'user_id': self.user_id,
                          'v': 5.61,
                          'access_token': access_token,
+                         # 'extended' : 1,
+                         # 'fields' : 'name, member_count'
                          }
 
-        groups_response = requests.get(URL+'groups.get', groups_params)
-        friends_set = set(groups_response.json()['response']['items'])
+        groups_response = requests.get(URL + 'groups.get', groups_params)
+        try:
+            friends_set = set(groups_response.json()['response']['items'])
+            return friends_set
 
-        return friends_set
+        except KeyError:
+            error_msg = groups_response.json()['error']['error_msg']
+            if error_msg == 'Too many requests per second':
+                try:
+                    time.sleep(1.5)
+                    groups_response = requests.get(URL + 'groups.get', groups_params)
+                    friends_set = set(groups_response.json()['response']['items'])
+                    return friends_set
+                except KeyError:
+                    error_msg = groups_response.json()['error']['error_msg']
+                    return error_msg
+            else:
+                return error_msg
 
     def user_url(self):
         """ Возвращает ссылку на профиль пользователя
@@ -106,13 +125,30 @@ if __name__ == '__main__':
         try:
             # pprint(friend.get_user_groups())
             # из множества групп пользователя убираем группы в которых состоит друг:
-            unic_user_groups = unic_user_groups - friend.get_user_groups()
-            print('.')
-        except KeyError:  # исключение вызывается когда пользователь ограничил доступ к своим группам
-            print(f'Нет доступа к группам пользователя id{friend.user_id}')
+            get_user_groups_method_respond = friend.get_user_groups()
+            unic_user_groups = unic_user_groups - get_user_groups_method_respond
+            print('. user c id', friend.user_id, 'обработан')
+        except TypeError:  # исключение вызывается когда пользователь ограничил доступ к своим группам
+            print(f'Нет информации от пользователя https://vk.com/id{friend.user_id} ', get_user_groups_method_respond)
 
-
-        # if i == 20:  # сервисный инструмент, который ограничивает число итераций
+        # if i == 5:  # сервисный инструмент, который ограничивает число итераций
         #     break
 
     print(f'\nПеречень уникальных групп пользователя {john.user_url()}: \n', unic_user_groups)
+
+
+# Вывод информации о группах из перечня уникальных групп:
+    list_for_request = ''
+    for group in list(unic_user_groups):
+        list_for_request += str(group)+', '
+
+    pararams = {'user_id': 3983782,
+                'v': 5.61,
+                'access_token': access_token,
+                'group_ids': list_for_request,
+                }
+
+    groups_response = requests.get(URL + 'groups.getById', pararams)
+    for group in groups_response.json()['response']:
+        print('id: {}, Название: \n{}\nhttps://vk.com/{}\n'.format(group['id'], group['name'], group['screen_name']))
+
