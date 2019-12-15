@@ -5,11 +5,14 @@ API_KEY = 'trnsl.1.1.20190712T081241Z.0309348472c8719d.0efdbc7ba1c507292080e3fbf
 DRIVE_API_KEY = 'AgAAAAAkrU39AADLW76HckcSYUJLolhAC5vWOJs'
 URL = 'https://translate.yandex.net/api/v1.5/tr.json/translate'
 URL_for_lang_detect = 'https://translate.yandex.net/api/v1.5/tr.json/detect'
+URL_drive_path_request = 'https://cloud-api.yandex.net/v1/disk/resources/upload'
+
 
 def translate_it(*files_to_translate, to_lang='ru'):
     """ Функция берёт каждый файл с текстом, указанный в параметре *files_to_translate, определяет
     его язык, переводит на указанный в параметре to_lang язык и сохраняет в файл
     с названием в формате from_<язык с которого переводим>_to_<язык на который переводим>.txt
+    на компьютер пользователя и на яндекс диск пользователя
 
     параметры запроса для перевода:
     URL = https://translate.yandex.net/api/v1.5/tr.json/translate ?
@@ -59,20 +62,29 @@ def translate_it(*files_to_translate, to_lang='ru'):
 
         # Подготовим текст для записи в файл
         json_ = response.json()
-        text_for_file = ' '.join(json_['text'])
+        text_for_file = ' '.join(json_['text']).encode('utf-8')
 
         # Параметры для запроса яндекс диску
-        write_to_drive_params = {'path':f'from_{from_lang}_to_{to_lang}.txt'}
+        write_to_drive_params = {'path': f'from_{from_lang}_to_{to_lang}.txt'}
 
         # Запросим путь для записи на яндекс-дикс
-        drive_path = requests.get('https://cloud-api.yandex.net/v1/disk/resources/upload', write_to_drive_params, headers={'Authorization': DRIVE_API_KEY})
-
-        # Произведём запись на яндекс диск по предоставленному пути
-        requests.put(drive_path.json()['href'], data=text_for_file.encode("utf-8"))
+        drive_path = requests.get(URL_drive_path_request,
+                                  write_to_drive_params,
+                                  headers={'Authorization': DRIVE_API_KEY}
+                                  )
 
         # записываем результат перевода в новый файл на компьютере
         with open(f'from_{from_lang}_to_{to_lang}.txt', 'w', encoding='UTF8') as ftw:
             ftw.write(' '.join(json_['text']))
+            print(f'from_{from_lang}_to_{to_lang}.txt файл записан')
+
+        # Произведём запись на яндекс диск по предоставленному пути
+        with open(f'from_{from_lang}_to_{to_lang}.txt', 'r', encoding='UTF8') as ftdw:
+            print(f'from_{from_lang}_to_{to_lang}.txt файл открыт для чтения')
+            files = {f'from_{from_lang}_to_{to_lang}.txt': ftdw}
+
+            requests.put(drive_path.json()['href'], files=files)
+            print(f'from_{from_lang}_to_{to_lang}.txt записан на яндекс-диск')
 
         # сервисное сообщение для пользователя
         print(f'Создан файл from_{from_lang}_to_{to_lang}.txt')
@@ -80,4 +92,3 @@ def translate_it(*files_to_translate, to_lang='ru'):
 
 if __name__ == '__main__':
     translate_it('fr.txt', 'de.txt', 'es.txt', to_lang='ru')
-
