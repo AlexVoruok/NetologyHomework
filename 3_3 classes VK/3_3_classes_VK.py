@@ -43,17 +43,18 @@ class User():
         url = f'https://vk.com/id{self.user_id}'
         return print(url)
 
-    def common_friends_list(self, IDuser2):
-        '''
+    def __and__(self, IDuser2):
+
+        """
         Принимает на вход id пользователя с которым требуется найти общих друзей
         возвращает список общих друзей этих двух пользователей
         где каждый элемент списка - экземпляр класса User
         Выводит сообщение, если мы пытаемся сравнитьсписки пользователей с самим же собой
-        '''
+        """
 
         # создадим экземляры класса
         user1 = self
-        user2 = User(IDuser2)
+        user2 = IDuser2
 
         # выявим пересечение множеств друзей пользователей и сделаем из этого список
         if self.user_id != user2.user_id:
@@ -65,27 +66,34 @@ class User():
             list_common_friends_classes = []
             for user in common_friends:
                 list_common_friends_classes.append(User(user))
-            return list_common_friends_classes
+            return pprint(list_common_friends_classes)
 
         else:
             error = 'В качестве объекта для сравнениея вы ввели пользователя с тем же самым ID. \n' \
                     'Для корректной работы функции common_friends_list требуется ввести ID другого пользователя'
-            return error
+            return pprint(error)
+
+    def __str__(self):
+
+        url = f'https://vk.com/id{self.user_id}'
+        return url
+
 
 
 
 if __name__ == '__main__':
 
     alex = User(2553860)
+    some = User(4679683)
 
     # Ссылка на профиль пользователя
-    alex.user_url()
+    print(alex)
 
     # общие друзия с пользователем 4679683
-    pprint(alex.common_friends_list(4679683))
+    alex&some
     print('\n')
 
     # опопытаемся сравнить списки друзей с самим собой
-    print(alex.common_friends_list(2553860))
+    alex&alex
 
 
