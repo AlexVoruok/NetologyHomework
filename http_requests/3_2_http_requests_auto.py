@@ -76,18 +76,19 @@ def translate_it(*files_to_translate, to_lang='ru'):
         # записываем результат перевода в новый файл на компьютере
         with open(f'from_{from_lang}_to_{to_lang}.txt', 'w', encoding='UTF8') as ftw:
             ftw.write(' '.join(json_['text']))
-            print(f'from_{from_lang}_to_{to_lang}.txt файл записан')
-
+            print(f'from_{from_lang}_to_{to_lang}.txt файл записан на диск')
+#
         # Произведём запись на яндекс диск по предоставленному пути
-        with open(f'from_{from_lang}_to_{to_lang}.txt', 'r', encoding='UTF8') as ftdw:
+        with open(f'from_{from_lang}_to_{to_lang}.txt', 'w+', encoding='UTF8') as ftdw:
             print(f'from_{from_lang}_to_{to_lang}.txt файл открыт для чтения')
             files = {f'from_{from_lang}_to_{to_lang}.txt': ftdw}
 
-            requests.put(drive_path.json()['href'], files=files)
-            print(f'from_{from_lang}_to_{to_lang}.txt записан на яндекс-диск')
+            requests.put(
+                drive_path.json()['href'],
+                files=files,
+                headers = {'Authorization': DRIVE_API_KEY, 'content-type': 'text/plain'})
+            print(f'from_{from_lang}_to_{to_lang}.txt записан на яндекс-диск\n')
 
-        # сервисное сообщение для пользователя
-        print(f'Создан файл from_{from_lang}_to_{to_lang}.txt')
 
 
 if __name__ == '__main__':
