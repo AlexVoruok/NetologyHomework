@@ -79,14 +79,15 @@ def translate_it(*files_to_translate, to_lang='ru'):
             print(f'from_{from_lang}_to_{to_lang}.txt файл записан на диск')
 #
         # Произведём запись на яндекс диск по предоставленному пути
-        with open(f'from_{from_lang}_to_{to_lang}.txt', 'w+', encoding='UTF8') as ftdw:
+        with open(f'from_{from_lang}_to_{to_lang}.txt', 'r', encoding='UTF8') as ftdw:
             print(f'from_{from_lang}_to_{to_lang}.txt файл открыт для чтения')
             files = {f'from_{from_lang}_to_{to_lang}.txt': ftdw}
 
             requests.put(
                 drive_path.json()['href'],
                 files=files,
-                headers = {'Authorization': DRIVE_API_KEY, 'content-type': 'text/plain'})
+                headers = {'content-type': 'text/plain' }
+                )
             print(f'from_{from_lang}_to_{to_lang}.txt записан на яндекс-диск\n')
 
 
