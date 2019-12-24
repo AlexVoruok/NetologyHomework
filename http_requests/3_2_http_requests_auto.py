@@ -54,7 +54,7 @@ def translate_it(*files_to_translate, to_lang='ru'):
         params = {
             'key': API_KEY,
             'text': text_to_translate,
-            'lang': '{}-{}'.format(from_lang, to_lang),
+            'lang': '{}-{}'.format(from_lang, to_lang)
         }
 
         # запрос переводчику
@@ -65,7 +65,9 @@ def translate_it(*files_to_translate, to_lang='ru'):
         text_for_file = ' '.join(json_['text']).encode('utf-8')
 
         # Параметры для запроса яндекс диску
-        write_to_drive_params = {'path': f'from_{from_lang}_to_{to_lang}.txt'}
+        write_to_drive_params = {'path': f'from_{from_lang}_to_{to_lang}.txt',
+                                 'overwrite': True
+                                 }
 
         # Запросим путь для записи на яндекс-дикс
         drive_path = requests.get(URL_drive_path_request,
@@ -79,14 +81,12 @@ def translate_it(*files_to_translate, to_lang='ru'):
             print(f'from_{from_lang}_to_{to_lang}.txt файл записан на диск')
 #
         # Произведём запись на яндекс диск по предоставленному пути
-        with open(f'from_{from_lang}_to_{to_lang}.txt', 'r', encoding='UTF8') as ftdw:
+        with open(f'from_{from_lang}_to_{to_lang}.txt', 'rb') as ftdw:
             print(f'from_{from_lang}_to_{to_lang}.txt файл открыт для чтения')
-            files = {f'from_{from_lang}_to_{to_lang}.txt': ftdw}
 
             requests.put(
                 drive_path.json()['href'],
-                files=files,
-                headers = {'content-type': 'text/plain' }
+                data = ftdw
                 )
             print(f'from_{from_lang}_to_{to_lang}.txt записан на яндекс-диск\n')
 
