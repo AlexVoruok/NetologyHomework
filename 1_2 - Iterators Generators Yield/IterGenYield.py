@@ -1,5 +1,5 @@
 import json
-from pprint import pprint
+import hashlib
 
 
 class LinkMaker:
@@ -25,18 +25,30 @@ class LinkMaker:
             raise StopIteration
 
 
+def hash_generator(path):
+    with open(path, encoding='utf-8') as readfile:
+        iterator = readfile.__iter__()
+        nextstring = iterator.__next__().rstrip()  # Уберём перенос строки
+        try:
+            while True:
+                hashmd5 = hashlib.md5(nextstring.encode('utf-8')).hexdigest()
+                yield hashmd5, nextstring
+                nextstring = iterator.__next__().rstrip()  # Уберём перенос строки
+        except StopIteration:
+            pass
+
+
 if __name__ == '__main__':
 
     with open('countries.json', 'r') as f:
         sourcedata = json.load(f)
 
-    # pprint(sourcedata[0])
-    #
-    # for country in sourcedata:
-    #     name = country['name']['official'].replace(' ', '_')
-    #     pprint(f'https://wikipedia.org/wiki/{name}')
-
+    # передаём файловый объект генератору ссылок и записываем результат в новый файл
     with open('country_wikilinks.txt', 'w', encoding='utf-8') as wikilinks:
         for link in LinkMaker(sourcedata, 'https://wikipedia.org/wiki/'):
             print(link)
             wikilinks.write(link + '\n')
+
+    # для каждой строки полученного выше файла генерируем хэш-сумму и выводим на экран
+    for hash_string, string in hash_generator('country_wikilinks.txt'):
+        print(fr'хеш {hash_string} - для строки "{string}"')
