@@ -51,4 +51,4 @@ if __name__ == '__main__':
 
     # для каждой строки полученного выше файла генерируем хэш-сумму и выводим на экран
     for hash_string, string in hash_generator('country_wikilinks.txt'):
-        print(fr'хеш {hash_string} - для строки "{string}"')
+        print(f'хеш {hash_string} - для строки "{string}"')
