@@ -24,18 +24,30 @@ class LinkMaker:
         except IndexError:
             raise StopIteration
 
+# Первая версия:
+
+# def hash_generator(path):
+#     with open(path, encoding='utf-8') as readfile:
+#         iterator = readfile.__iter__()
+#         nextstring = iterator.__next__().rstrip()  # Уберём перенос строки
+#         try:
+#             while True:
+#                 hashmd5 = hashlib.md5(nextstring.encode('utf-8')).hexdigest()
+#                 yield hashmd5, nextstring
+#                 nextstring = iterator.__next__().rstrip()  # Уберём перенос строки
+#         except StopIteration:
+#             pass
 
 def hash_generator(path):
     with open(path, encoding='utf-8') as readfile:
-        iterator = readfile.__iter__()
-        nextstring = iterator.__next__().rstrip()  # Уберём перенос строки
-        try:
-            while True:
-                hashmd5 = hashlib.md5(nextstring.encode('utf-8')).hexdigest()
-                yield hashmd5, nextstring
-                nextstring = iterator.__next__().rstrip()  # Уберём перенос строки
-        except StopIteration:
-            pass
+        while True:
+            nextstring = readfile.readline().rstrip()
+            if nextstring == '':
+                break
+            hashmd5 = hashlib.md5(nextstring.encode('utf-8')).hexdigest()
+            yield hashmd5, nextstring
+
+
 
 
 if __name__ == '__main__':
