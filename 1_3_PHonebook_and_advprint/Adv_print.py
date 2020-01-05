@@ -43,5 +43,5 @@ if __name__ == '__main__':
            'print - adv_print. Она ничем не должна отличаться от классической функции кроме трех ' \
            'новых необязательных аргументов:'
 
-    tuple = (4, 5, 6)
-    adv_print(1, 2, 3, tuple, text, max_line=50, in_file='output.txt')
+    tup = (4, 5, 6)
+    adv_print(1, 2, 3, tup, text, max_line=50, in_file='output.txt')
