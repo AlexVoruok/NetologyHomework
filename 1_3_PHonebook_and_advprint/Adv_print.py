@@ -31,8 +31,6 @@ def adv_print(*args, start='', max_line=0, in_file=''):
     if in_file:
         with open(in_file, 'w', encoding='utf-8') as file:
             file.write(to_print)
-    else:
-        print('не в файл')
 
     return print(to_print)
 
