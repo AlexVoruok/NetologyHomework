@@ -32,7 +32,8 @@ def adv_print(*args, start='', max_line=0, in_file=''):
         with open(in_file, 'w', encoding='utf-8') as file:
             file.write(to_print)
 
-    return print(to_print)
+    print(to_print)
+    return to_print
 
 
 if __name__ == '__main__':
