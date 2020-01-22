@@ -1,4 +1,4 @@
-from secretary_program.data_base import directories, documents
+from Tests_homework.data_base import directories, documents
 
 # Сообщение об отсутствующем документе
 warning_doc_num = ("\nДокумента с таким номером не существует \n"
@@ -38,6 +38,7 @@ def people_by_number():
                 print(f'Для документа {doc_number} не указан владелец\n')
     if not exist:
         print(warning_doc_num)
+        value = 'hi'
 
 
 def all_doc_list():
@@ -46,7 +47,12 @@ def all_doc_list():
 
     """
     for doc in documents:
-        print(f' {doc["type"]:12}  "{doc["number"]}"   "{doc["name"]}"')
+        try:
+            doc["name"]
+        except KeyError:
+            doc["name"] = ''
+        finally:
+            print(f' {doc["type"]:12}  "{doc["number"]}"   "{doc["name"]}"')
 
 
 def doc_shell_find():
