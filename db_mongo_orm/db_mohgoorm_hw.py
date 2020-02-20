@@ -16,9 +16,7 @@ def read_data(csv_file, db):
             row['Цена'] = int(row['Цена'])
 
             # ПРоверим наличие этих данных в ДБ и запишем если нет
-            if list(db.find(row)):
-                pass
-            else:
+            if not list(db.find(row)):
                 db.insert_one(row)
                 print('row added')
 
@@ -40,24 +38,25 @@ def find_by_name(name, db):
     и вернуть их по возрастанию цены
     """
 
-    # regex = re.compile('укажите регулярное выражение для поиска. ' \
-    #                    'Обратите внимание, что в строке могут быть специальные символы, их нужно экранировать')
+    # получим список слов, которые мы будем искать в базе без пробелов и знаков препинания
+    pattern = '\\w+'
+    words_to_find = re.findall(pattern, name)
 
-    pattern = "[\\w]+"
+    # поищем каждое слово из сформированного списка в базе и выведем результат
+    printed_list = []  # список для хранения названия группы, которые мы уже вывели на печать
+    for word in words_to_find:
+        regex = re.compile(word, re.IGNORECASE)
+        result = db.find({'Исполнитель': {'$regex': regex}})
 
-    names_to_search = re.findall(pattern, name.lower())
-
-    # print(names_to_search)
-
-    for concert in db.find():
-        names_to_check = re.findall(pattern, concert['Исполнитель'].lower())
-        # print(names_to_check)
-
-        if set(names_to_search) & set(names_to_check):
-            print('Исполнитель:', concert['Исполнитель'])
-            print('Цена', concert['Цена'])
-            print('Место', concert['Место'])
-            print('Дата', concert['Дата'])
+        # Выведем результат только в том случае, если мы его ранее не выводили
+        for row in result:
+            if row['Исполнитель'] not in printed_list:
+                print('Исполнитель:', row['Исполнитель'])
+                print('Цена', row['Цена'])
+                print('Место', row['Место'])
+                print('Дата', row['Дата'])
+                print()
+                printed_list.append(row['Исполнитель'])
 
 
 if __name__ == '__main__':
