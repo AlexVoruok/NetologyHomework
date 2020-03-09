@@ -37,7 +37,16 @@ def get_user_data(user_id):
     return main_user_data
 
 
-def search_people(main_user_sex, count):
+def city_data(city_name):
+    if type(city_name)==int:
+        return city_name
+    else:
+        vk = get_vk_session()
+        search_res = vk.database.getCities(country_id=1, q=city_name, count=1)
+        return search_res['items'][0]['id']
+
+
+def search_people(main_user_sex, count, city_source):
 
     vk = get_vk_session()
     if main_user_sex == 1:
@@ -47,14 +56,17 @@ def search_people(main_user_sex, count):
     else:
         sex_to_search = 0
 
+    city = city_data(city_source)
     count = count
     sort = 0
     q = ''
     fields = 'city, sex, books, country, home_town, interests, movies, music, personal'
 
-    search_res = vk.users.search(q=q, count=count, sort=sort, sex=sex_to_search, fields=fields)
+    search_res = vk.users.search(q=q, count=count, sort=sort, sex=sex_to_search, fields=fields, city=city)
+    # print(search_res)
     return search_res
 
 
 if __name__ == '__main__':
-    pass
+    print(city_data(49))
+

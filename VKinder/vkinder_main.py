@@ -132,6 +132,10 @@ def data_checker(data):
                     data[key] = make_keywords(input(f'Введите данные для {key} в текстовом формате: '))
                     print(data[key])
 
+                # elif key == 'city':
+                #     data[key] = input('Введите ваш город: ')
+                #
+
                 elif key == 'alcohol':
                     data[key] = input(MSG_ALCOHOL)
                 elif key == 'life_main':
@@ -161,15 +165,16 @@ class VKUser:
             data = get_user_data(u_id)
             # Строки которые есть в данных об основном пользователи преобразуем
             # в список ключевых слов при помощи функции make_keywords
+            # pprint(data)
 
             self.id = u_id
             self.sex = data['sex']
             self.first_name = data['first_name']
             self.last_name = data['last_name']
 
-            self.country = data['country']['title']
-            self.city = data['city']['title']
-            self.home_town = data['home_town']
+            self.country = data['country']['id'] if 'country' in data else None
+            self.city = data['city']['id'] if 'city' in data else None
+            self.home_town = data['home_town'] if 'home_town' in data else None
 
             self.interests = make_keywords(data['interests'])
             self.books = make_keywords(data['books'])
@@ -179,7 +184,7 @@ class VKUser:
             if 'personal' in data:
                 self.alcohol = data['personal'].get('alcohol')
                 self.inspired_by = make_keywords(data['personal'].get('inspired_by', ''))
-                self.langs = set(data['personal'].get('langs'))
+                self.langs = set(data['personal'].get('langs', []))
                 self.life_main = data['personal'].get('life_main')
                 self.people_main = data['personal'].get('people_main', '')
                 self.political = data['personal'].get('political')
@@ -208,8 +213,8 @@ class VKUser:
             self.first_name = user_info['first_name']
             self.last_name = user_info['last_name']
 
-            self.country = user_info['country']['title'] if 'country' in user_info else None
-            self.city = user_info['city']['title'] if 'city' in user_info else None
+            self.country = user_info['country']['id'] if 'country' in user_info else None
+            self.city = user_info['city']['id'] if 'city' in user_info else None
             self.home_town = user_info['home_town'] if 'home_town' in user_info else None
 
             self.interests = make_keywords(user_info.get('interests', ''))
@@ -330,7 +335,7 @@ class VKUser:
         выводит первые list_number с максимальным рейтингом
         """
         pair_set = set()
-        search_res = search_people(self.sex, count)
+        search_res = search_people(self.sex, count, self.city)
         # pprint(search_res)
         for man in search_res['items']:
             # pprint(man)
