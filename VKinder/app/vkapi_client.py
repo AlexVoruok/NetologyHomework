@@ -29,16 +29,26 @@ def get_user_data(user_id):
     """
 
     vk = get_vk_session()
-    fields = 'city, sex, books, country, home_town, interests, movies, music, personal'
+    fields = 'id, city, sex, bdate, books, country, home_town, interests, movies, music, personal'
     main_user_data = vk.users.get(user_ids=str(user_id), fields=fields)[0]
-    # group_ids = vk.groups.get()['items']
+
+
+    # Достанем год рождения, если он есть
+    date = main_user_data.get('bdate', '')
+    dates = date.split('.')
+    len_dates = len(dates)
+    if len_dates == 3:
+        main_user_data['bdate'] = int(dates[-1])
+
+    else:
+        main_user_data['bdate'] = ''
 
     # pprint(main_user_data)
     return main_user_data
 
 
 def city_data(city_name):
-    if type(city_name)==int:
+    if type(city_name) == int:
         return city_name
     else:
         vk = get_vk_session()
@@ -47,6 +57,12 @@ def city_data(city_name):
 
 
 def search_people(main_user_sex, count, city_source):
+    '''
+    :param main_user_sex:
+    :param count: размер выдачи поиска
+    :param city_source: название города в виде строки
+    :return:
+    '''
 
     vk = get_vk_session()
     if main_user_sex == 1:
@@ -60,13 +76,36 @@ def search_people(main_user_sex, count, city_source):
     count = count
     sort = 0
     q = ''
-    fields = 'city, sex, books, country, home_town, interests, movies, music, personal'
+    fields = 'city, sex, bdate, books, country, home_town, interests, movies, music, personal'
 
     search_res = vk.users.search(q=q, count=count, sort=sort, sex=sex_to_search, fields=fields, city=city)
-    # print(search_res)
+
+    # Достанем год рождения, если он есть
+    for man in search_res['items']:
+        date = man.get('bdate', '')
+        dates = date.split('.')
+        len_dates = len(dates)
+        if len_dates == 3:
+            man['bdate'] = int(dates[-1])
+
+        else:
+            man['bdate'] = ''
+
+    # pprint(search_res)
+    return search_res
+
+
+def get_profile_photo(user_id):
+    vk = get_vk_session()
+    try:
+        search_res = vk.photos.get(owner_id=user_id, album_id='profile', extended=1)
+
+    except Exception:
+        search_res = {}
+        search_res['items'] = False
+
     return search_res
 
 
 if __name__ == '__main__':
-    print(city_data(49))
-
+    get_profile_photo(2553860)

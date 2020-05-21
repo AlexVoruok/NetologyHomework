@@ -28,4 +28,3 @@ def get_vk_session():
         print('success authorization with new token')
         return vk_session.get_api()
 
-#TODO: научить обрабатывать исключение при неправильном вводе пароля или имени пользователя
